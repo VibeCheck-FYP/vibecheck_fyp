@@ -1,0 +1,25 @@
+{
+  "nodes": [
+    "State_0_Start",
+    "State_1_CheckFunds",
+    "State_2_Approve",
+    "State_3_Reject"
+  ],
+  "edges": [
+    {
+      "src": "State_0_Start",
+      "dst": "State_1_CheckFunds",
+      "condition": "true"
+    },
+    {
+      "src": "State_1_CheckFunds",
+      "dst": "State_2_Approve",
+      "condition": "balance >= 100"
+    },
+    {
+      "src": "State_1_CheckFunds",
+      "dst": "State_3_Reject",
+      "condition": "not (balance >= 100)"
+    }
+  ]
+}
