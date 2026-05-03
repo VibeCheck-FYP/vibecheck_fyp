@@ -1,0 +1,8 @@
+{
+  "nodes": ["Start", "Check", "Success", "Fail"],
+  "edges": [
+    {"src": "Start", "dst": "Check", "condition": "true"},
+    {"src": "Check", "dst": "Success", "condition": "balance >= 100"},
+    {"src": "Check", "dst": "Fail", "condition": "Not(balance >= 100)"}
+  ]
+}

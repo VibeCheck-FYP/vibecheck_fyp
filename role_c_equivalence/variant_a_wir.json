@@ -1,0 +1,8 @@
+{
+  "nodes": ["State_0", "State_1", "State_2", "State_3"],
+  "edges": [
+    {"src": "State_0", "dst": "State_1", "condition": "true"},
+    {"src": "State_1", "dst": "State_2", "condition": "balance >= 100"},
+    {"src": "State_1", "dst": "State_3", "condition": "Not(balance >= 100)"}
+  ]
+}
