@@ -19,7 +19,7 @@
     {
       "src": "State_1_CheckFunds",
       "dst": "State_3_Reject",
-      "condition": "not (balance >= 100)"
+      "condition": "Not(balance >= 100)"
     }
   ]
 }
