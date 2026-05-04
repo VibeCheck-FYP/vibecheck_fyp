@@ -1,0 +1,8 @@
+{
+  "nodes": ["Spec_Start", "Spec_Check", "Spec_Approve", "Spec_Reject"],
+  "edges": [
+    {"src": "Spec_Start", "dst": "Spec_Check", "condition": "true"},
+    {"src": "Spec_Check", "dst": "Spec_Approve", "condition": "balance >= 100"},
+    {"src": "Spec_Check", "dst": "Spec_Reject", "condition": "Not(balance >= 100)"}
+  ]
+}
