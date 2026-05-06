@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.3.1">
+  <process id="Process_1" isExecutable="false">
+    <startEvent id="startEvent_1" name="Start">
+      <outgoing>Flow_1jblqx7</outgoing>
+    </startEvent>
+    <task id="task_2" name="ServiceNow_incident__4_0_0__retrievewithwhere_incident">
+      <incoming>Flow_1jblqx7</incoming>
+    </task>
+    <exclusiveGateway id="exclusiveGateway_3" name="Decision: incident.priority == &#39;high&#39;" />
+    <sequenceFlow id="flow_task_2_exclusiveGateway_3" sourceRef="task_2" targetRef="exclusiveGateway_3" />
+    <task id="task_4" name="Jira_Issue__2_0_0__create_Issue">
+      <outgoing>Flow_0jn1epa</outgoing>
+    </task>
+    <sequenceFlow id="flow_exclusiveGateway_3_task_4" sourceRef="exclusiveGateway_3" targetRef="task_4" />
+    <task id="task_5" name="Slack_message__3_0_0__create_message">
+      <incoming>Flow_0jn1epa</incoming>
+    </task>
+    <task id="task_6" name="GitHub_Issue__3_0_0__create_Issue" />
+    <sequenceFlow id="flow_exclusiveGateway_3_task_6" sourceRef="exclusiveGateway_3" targetRef="task_6" />
+    <exclusiveGateway id="exclusiveGateway_7" name="Merge">
+      <outgoing>Flow_0hmmaz6</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="flow_task_5_exclusiveGateway_7" sourceRef="task_5" targetRef="exclusiveGateway_7" />
+    <sequenceFlow id="flow_task_6_exclusiveGateway_7" sourceRef="task_6" targetRef="exclusiveGateway_7" />
+    <endEvent id="endEvent_8" name="End">
+      <incoming>Flow_0hmmaz6</incoming>
+    </endEvent>
+    <sequenceFlow id="Flow_1jblqx7" sourceRef="startEvent_1" targetRef="task_2" />
+    <sequenceFlow id="Flow_0jn1epa" sourceRef="task_4" targetRef="task_5" />
+    <sequenceFlow id="Flow_0hmmaz6" sourceRef="exclusiveGateway_7" targetRef="endEvent_8" />
+  </process>
+</definitions>
