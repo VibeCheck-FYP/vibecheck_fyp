@@ -1,0 +1,476 @@
+{
+  "semantic_bpmn_map": {
+    "process_id": "Process_1",
+    "tasks": {
+      "task_2": {
+        "bpmn_id": "task_2",
+        "kind": "task",
+        "label": "ServiceNow_incident__4_0_0__retrievewithwhere_incident",
+        "atomic_props": {
+          "begin": "begin_task_2",
+          "end": "end_task_2"
+        }
+      },
+      "task_4": {
+        "bpmn_id": "task_4",
+        "kind": "task",
+        "label": "Jira_Issue__2_0_0__create_Issue",
+        "atomic_props": {
+          "begin": "begin_task_4",
+          "end": "end_task_4"
+        }
+      },
+      "task_5": {
+        "bpmn_id": "task_5",
+        "kind": "task",
+        "label": "Slack_message__3_0_0__create_message",
+        "atomic_props": {
+          "begin": "begin_task_5",
+          "end": "end_task_5"
+        }
+      },
+      "task_6": {
+        "bpmn_id": "task_6",
+        "kind": "task",
+        "label": "GitHub_Issue__3_0_0__create_Issue",
+        "atomic_props": {
+          "begin": "begin_task_6",
+          "end": "end_task_6"
+        }
+      }
+    },
+    "gateways": {
+      "exclusiveGateway_3": {
+        "bpmn_id": "exclusiveGateway_3",
+        "kind": "exclusiveGateway",
+        "label": "Decision: incident.priority == 'high'",
+        "decision_expression": "incident.priority == 'high'",
+        "atomic_props": {
+          "evaluate": "gw_exclusiveGateway_3_taken"
+        }
+      },
+      "exclusiveGateway_7": {
+        "bpmn_id": "exclusiveGateway_7",
+        "kind": "exclusiveGateway",
+        "label": "Merge",
+        "decision_expression": null,
+        "atomic_props": {
+          "evaluate": "gw_exclusiveGateway_7_taken"
+        }
+      }
+    },
+    "events": {
+      "startEvent_1": {
+        "bpmn_id": "startEvent_1",
+        "kind": "startEvent",
+        "label": "Start",
+        "atomic_props": {
+          "instant": "begin_startEvent_1"
+        }
+      },
+      "endEvent_8": {
+        "bpmn_id": "endEvent_8",
+        "kind": "endEvent",
+        "label": "End",
+        "atomic_props": {
+          "instant": "begin_endEvent_8"
+        }
+      }
+    },
+    "sequence_flows": [
+      {
+        "flow_id": "flow_task_2_exclusiveGateway_3",
+        "source_ref": "task_2",
+        "target_ref": "exclusiveGateway_3",
+        "name": null,
+        "condition_expression": null
+      },
+      {
+        "flow_id": "flow_exclusiveGateway_3_task_4",
+        "source_ref": "exclusiveGateway_3",
+        "target_ref": "task_4",
+        "name": null,
+        "condition_expression": "incident.priority == 'high'"
+      },
+      {
+        "flow_id": "flow_exclusiveGateway_3_task_6",
+        "source_ref": "exclusiveGateway_3",
+        "target_ref": "task_6",
+        "name": null,
+        "condition_expression": "!(incident.priority == 'high')"
+      },
+      {
+        "flow_id": "flow_task_5_exclusiveGateway_7",
+        "source_ref": "task_5",
+        "target_ref": "exclusiveGateway_7",
+        "name": null,
+        "condition_expression": null
+      },
+      {
+        "flow_id": "flow_task_6_exclusiveGateway_7",
+        "source_ref": "task_6",
+        "target_ref": "exclusiveGateway_7",
+        "name": null,
+        "condition_expression": null
+      },
+      {
+        "flow_id": "Flow_1jblqx7",
+        "source_ref": "startEvent_1",
+        "target_ref": "task_2",
+        "name": null,
+        "condition_expression": null
+      },
+      {
+        "flow_id": "Flow_0jn1epa",
+        "source_ref": "task_4",
+        "target_ref": "task_5",
+        "name": null,
+        "condition_expression": null
+      },
+      {
+        "flow_id": "Flow_0hmmaz6",
+        "source_ref": "exclusiveGateway_7",
+        "target_ref": "endEvent_8",
+        "name": null,
+        "condition_expression": "true"
+      }
+    ],
+    "notes": "Map BPMN IDs to AP names and decision text for Role B semantic tagging. Refine branch guards when <conditionExpression> is present on sequenceFlow."
+  },
+  "M_spec": {
+    "model": "M_spec",
+    "process_id": "Process_1",
+    "states": [
+      "endEvent_8",
+      "exclusiveGateway_3",
+      "exclusiveGateway_7",
+      "startEvent_1",
+      "task_2",
+      "task_4",
+      "task_5",
+      "task_6"
+    ],
+    "initial_states": [
+      "startEvent_1"
+    ],
+    "accepting_states": [
+      "endEvent_8"
+    ],
+    "transitions": [
+      {
+        "from": "task_2",
+        "to": "exclusiveGateway_3",
+        "flow_id": "flow_task_2_exclusiveGateway_3",
+        "guard": "true",
+        "labels": {
+          "traverse": "take_flow_task_2_exclusiveGateway_3"
+        }
+      },
+      {
+        "from": "exclusiveGateway_3",
+        "to": "task_4",
+        "flow_id": "flow_exclusiveGateway_3_task_4",
+        "guard": "incident.priority == 'high'",
+        "labels": {
+          "traverse": "take_flow_exclusiveGateway_3_task_4"
+        }
+      },
+      {
+        "from": "exclusiveGateway_3",
+        "to": "task_6",
+        "flow_id": "flow_exclusiveGateway_3_task_6",
+        "guard": "!(incident.priority == 'high')",
+        "labels": {
+          "traverse": "take_flow_exclusiveGateway_3_task_6"
+        }
+      },
+      {
+        "from": "task_5",
+        "to": "exclusiveGateway_7",
+        "flow_id": "flow_task_5_exclusiveGateway_7",
+        "guard": "true",
+        "labels": {
+          "traverse": "take_flow_task_5_exclusiveGateway_7"
+        }
+      },
+      {
+        "from": "task_6",
+        "to": "exclusiveGateway_7",
+        "flow_id": "flow_task_6_exclusiveGateway_7",
+        "guard": "true",
+        "labels": {
+          "traverse": "take_flow_task_6_exclusiveGateway_7"
+        }
+      },
+      {
+        "from": "startEvent_1",
+        "to": "task_2",
+        "flow_id": "Flow_1jblqx7",
+        "guard": "true",
+        "labels": {
+          "traverse": "take_Flow_1jblqx7"
+        }
+      },
+      {
+        "from": "task_4",
+        "to": "task_5",
+        "flow_id": "Flow_0jn1epa",
+        "guard": "true",
+        "labels": {
+          "traverse": "take_Flow_0jn1epa"
+        }
+      },
+      {
+        "from": "exclusiveGateway_7",
+        "to": "endEvent_8",
+        "flow_id": "Flow_0hmmaz6",
+        "guard": "true",
+        "labels": {
+          "traverse": "take_Flow_0hmmaz6"
+        }
+      }
+    ],
+    "semantic_ref": [
+      "task_2",
+      "task_4",
+      "task_5",
+      "task_6"
+    ]
+  },
+  "property_suite_P": [
+    {
+      "id": "LIVE_TERM_endEvent_8",
+      "category": "liveness_termination",
+      "criticality": "P0",
+      "formula": "G(alive -> (F(begin_endEvent_8)))",
+      "inner": "F(begin_endEvent_8)",
+      "covered_element_ids": [
+        "endEvent_8"
+      ]
+    },
+    {
+      "id": "ALIVE_STOP_endEvent_8",
+      "category": "alive_guard",
+      "criticality": "P0",
+      "formula": "G(alive -> ((begin_endEvent_8) -> F(!alive)))",
+      "inner": "(begin_endEvent_8) -> F(!alive)",
+      "covered_element_ids": [
+        "endEvent_8"
+      ]
+    },
+    {
+      "id": "ORD_flow_task_2_exclusiveGateway_3",
+      "category": "ordering",
+      "criticality": "P1",
+      "formula": "G(alive -> ((begin_exclusiveGateway_3) -> (end_task_2)))",
+      "inner": "(begin_exclusiveGateway_3) -> (end_task_2)",
+      "covered_element_ids": [
+        "task_2",
+        "exclusiveGateway_3",
+        "flow_task_2_exclusiveGateway_3"
+      ]
+    },
+    {
+      "id": "ORD_flow_exclusiveGateway_3_task_4",
+      "category": "ordering",
+      "criticality": "P1",
+      "formula": "G(alive -> ((begin_task_4) -> (begin_exclusiveGateway_3)))",
+      "inner": "(begin_task_4) -> (begin_exclusiveGateway_3)",
+      "covered_element_ids": [
+        "exclusiveGateway_3",
+        "task_4",
+        "flow_exclusiveGateway_3_task_4"
+      ]
+    },
+    {
+      "id": "ORD_flow_exclusiveGateway_3_task_6",
+      "category": "ordering",
+      "criticality": "P1",
+      "formula": "G(alive -> ((begin_task_6) -> (begin_exclusiveGateway_3)))",
+      "inner": "(begin_task_6) -> (begin_exclusiveGateway_3)",
+      "covered_element_ids": [
+        "exclusiveGateway_3",
+        "task_6",
+        "flow_exclusiveGateway_3_task_6"
+      ]
+    },
+    {
+      "id": "ORD_flow_task_5_exclusiveGateway_7",
+      "category": "ordering",
+      "criticality": "P1",
+      "formula": "G(alive -> ((begin_exclusiveGateway_7) -> (end_task_5)))",
+      "inner": "(begin_exclusiveGateway_7) -> (end_task_5)",
+      "covered_element_ids": [
+        "task_5",
+        "exclusiveGateway_7",
+        "flow_task_5_exclusiveGateway_7"
+      ]
+    },
+    {
+      "id": "ORD_flow_task_6_exclusiveGateway_7",
+      "category": "ordering",
+      "criticality": "P1",
+      "formula": "G(alive -> ((begin_exclusiveGateway_7) -> (end_task_6)))",
+      "inner": "(begin_exclusiveGateway_7) -> (end_task_6)",
+      "covered_element_ids": [
+        "task_6",
+        "exclusiveGateway_7",
+        "flow_task_6_exclusiveGateway_7"
+      ]
+    },
+    {
+      "id": "ORD_Flow_1jblqx7",
+      "category": "ordering",
+      "criticality": "P1",
+      "formula": "G(alive -> ((begin_task_2) -> (begin_startEvent_1)))",
+      "inner": "(begin_task_2) -> (begin_startEvent_1)",
+      "covered_element_ids": [
+        "startEvent_1",
+        "task_2",
+        "Flow_1jblqx7"
+      ]
+    },
+    {
+      "id": "ORD_Flow_0jn1epa",
+      "category": "ordering",
+      "criticality": "P1",
+      "formula": "G(alive -> ((begin_task_5) -> (end_task_4)))",
+      "inner": "(begin_task_5) -> (end_task_4)",
+      "covered_element_ids": [
+        "task_4",
+        "task_5",
+        "Flow_0jn1epa"
+      ]
+    },
+    {
+      "id": "ORD_Flow_0hmmaz6",
+      "category": "ordering",
+      "criticality": "P1",
+      "formula": "G(alive -> ((begin_endEvent_8) -> (begin_exclusiveGateway_7)))",
+      "inner": "(begin_endEvent_8) -> (begin_exclusiveGateway_7)",
+      "covered_element_ids": [
+        "exclusiveGateway_7",
+        "endEvent_8",
+        "Flow_0hmmaz6"
+      ]
+    },
+    {
+      "id": "GW_XOR_MUTEX_exclusiveGateway_3",
+      "category": "gateway_invariant",
+      "criticality": "P1",
+      "formula": "G(alive -> ((!((end_task_4) & (end_task_6)))))",
+      "inner": "(!((end_task_4) & (end_task_6)))",
+      "covered_element_ids": [
+        "exclusiveGateway_3",
+        "task_4",
+        "task_6"
+      ]
+    },
+    {
+      "id": "QUAL_FINISH_task_2",
+      "category": "quality_bounded_task",
+      "criticality": "P2",
+      "formula": "G(alive -> ((begin_task_2) -> F(end_task_2)))",
+      "inner": "(begin_task_2) -> F(end_task_2)",
+      "covered_element_ids": [
+        "task_2"
+      ]
+    },
+    {
+      "id": "QUAL_FINISH_task_4",
+      "category": "quality_bounded_task",
+      "criticality": "P2",
+      "formula": "G(alive -> ((begin_task_4) -> F(end_task_4)))",
+      "inner": "(begin_task_4) -> F(end_task_4)",
+      "covered_element_ids": [
+        "task_4"
+      ]
+    },
+    {
+      "id": "QUAL_FINISH_task_5",
+      "category": "quality_bounded_task",
+      "criticality": "P2",
+      "formula": "G(alive -> ((begin_task_5) -> F(end_task_5)))",
+      "inner": "(begin_task_5) -> F(end_task_5)",
+      "covered_element_ids": [
+        "task_5"
+      ]
+    },
+    {
+      "id": "QUAL_FINISH_task_6",
+      "category": "quality_bounded_task",
+      "criticality": "P2",
+      "formula": "G(alive -> ((begin_task_6) -> F(end_task_6)))",
+      "inner": "(begin_task_6) -> F(end_task_6)",
+      "covered_element_ids": [
+        "task_6"
+      ]
+    }
+  ],
+  "coverage_report": {
+    "gamma_struct": 1.0,
+    "counts": {
+      "structural_elements": 16,
+      "covered_by_suite": 16,
+      "uncovered": 0
+    },
+    "uncovered_ids": []
+  },
+  "mutation_report": {
+    "kappa_proxy": 1.0,
+    "mutants_total": 8,
+    "mutants_killed_proxy": 8,
+    "note": "Proxy \u03ba uses structural drift (property count / \u03b3_struct). Replace with model-checking kills vs M_spec.",
+    "rows": [
+      {
+        "mutant": "remove_flow:flow_task_2_exclusiveGateway_3",
+        "killed_proxy": true,
+        "gamma_struct_mutant": 1.0,
+        "num_props": 14
+      },
+      {
+        "mutant": "remove_flow:flow_exclusiveGateway_3_task_4",
+        "killed_proxy": true,
+        "gamma_struct_mutant": 1.0,
+        "num_props": 13
+      },
+      {
+        "mutant": "remove_flow:flow_exclusiveGateway_3_task_6",
+        "killed_proxy": true,
+        "gamma_struct_mutant": 1.0,
+        "num_props": 13
+      },
+      {
+        "mutant": "remove_flow:flow_task_5_exclusiveGateway_7",
+        "killed_proxy": true,
+        "gamma_struct_mutant": 1.0,
+        "num_props": 14
+      },
+      {
+        "mutant": "remove_flow:flow_task_6_exclusiveGateway_7",
+        "killed_proxy": true,
+        "gamma_struct_mutant": 1.0,
+        "num_props": 14
+      },
+      {
+        "mutant": "remove_flow:Flow_1jblqx7",
+        "killed_proxy": true,
+        "gamma_struct_mutant": 0.9333,
+        "num_props": 14
+      },
+      {
+        "mutant": "remove_flow:Flow_0jn1epa",
+        "killed_proxy": true,
+        "gamma_struct_mutant": 1.0,
+        "num_props": 14
+      },
+      {
+        "mutant": "remove_flow:Flow_0hmmaz6",
+        "killed_proxy": true,
+        "gamma_struct_mutant": 1.0,
+        "num_props": 14
+      }
+    ],
+    "rows_truncated": false
+  }
+}
