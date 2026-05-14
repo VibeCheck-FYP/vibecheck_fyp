@@ -406,7 +406,7 @@ def mutant_kill_report(
     }
 
 
-def run_role_a(path: Path | None = None, xml_text: str | None = None) -> dict[str, Any]:
+def run_role_a(path: Path | None = None, xml_text: str | None = None, threshold: float = 0.95, verbose: bool = True) -> dict[str, Any]:
     if path is not None:
         model = parse_bpmn_xml(path.read_bytes())
     elif xml_text is not None:
@@ -416,8 +416,19 @@ def run_role_a(path: Path | None = None, xml_text: str | None = None) -> dict[st
 
     semantic = build_semantic_map(model)
     m_spec = build_m_spec(model, semantic)
-    props = build_property_suite(model, semantic)
-    cov = structural_coverage(model, props)
+    
+    # Apply self-auditing specification layer with recursive refinement
+    audit_result = self_auditing_specification_layer(model, threshold=threshold, verbose=verbose)
+    
+    if audit_result["status"] == "failed":
+        print(f"\n⚠️  AUDIT FAILED: {audit_result['reason']}")
+        props = audit_result["properties"]
+        cov = audit_result["coverage"]
+    else:
+        print(f"\n✓ AUDIT PASSED: Coverage {audit_result['coverage']['gamma_struct']} meets threshold {threshold}")
+        props = audit_result["properties"]
+        cov = audit_result["coverage"]
+    
     mutants = simple_mutants(model)
     mut_rep = mutant_kill_report(props, cov["gamma_struct"], mutants)
 
@@ -427,13 +438,91 @@ def run_role_a(path: Path | None = None, xml_text: str | None = None) -> dict[st
         "property_suite_P": props,
         "coverage_report": cov,
         "mutation_report": mut_rep,
+        "audit_result": audit_result,
+    }
+
+
+def recursive_refinement_loop(
+    model: ParsedProcess,
+    threshold: float = 0.95,
+    max_iterations: int = 5,
+    verbose: bool = False,
+) -> tuple[list[dict[str, Any]], dict[str, Any], int]:
+    """
+    Recursively refine the property suite until structural coverage meets the threshold.
+    Returns (final_props, final_coverage, num_iterations).
+    """
+    semantic = build_semantic_map(model)
+    props = build_property_suite(model, semantic)
+    coverage = structural_coverage(model, props)
+    gamma = coverage["gamma_struct"]
+    iterations = 1
+    while gamma < threshold and iterations < max_iterations:
+        # Synthesize new properties for uncovered elements (simple placeholder logic)
+        uncovered = coverage["uncovered_ids"]
+        for uid in uncovered:
+            # Add a reachability property for uncovered node/flow
+            if uid in model.elements:
+                props.append({
+                    "id": f"SYNTH_REACH_{uid}",
+                    "category": "synthesized_reachability",
+                    "criticality": "P1",
+                    "formula": _alive_guard(f"F({_ap_begin(uid)})"),
+                    "inner": f"F({_ap_begin(uid)})",
+                    "covered_element_ids": [uid],
+                })
+            elif uid in model.flows:
+                fl = model.flows[uid]
+                props.append({
+                    "id": f"SYNTH_FLOW_{uid}",
+                    "category": "synthesized_flow",
+                    "criticality": "P1",
+                    "formula": _alive_guard(f"F(take_{uid})"),
+                    "inner": f"F(take_{uid})",
+                    "covered_element_ids": [uid],
+                })
+        coverage = structural_coverage(model, props)
+        gamma = coverage["gamma_struct"]
+        iterations += 1
+        if verbose:
+            print(f"Refinement iteration {iterations}: coverage={gamma}")
+    return props, coverage, iterations
+
+
+def self_auditing_specification_layer(
+    model: ParsedProcess,
+    threshold: float = 0.95,
+    max_iterations: int = 5,
+    verbose: bool = False,
+) -> dict[str, Any]:
+    """
+    Self-auditing wrapper: ensures the property suite is robust before audit.
+    Returns a dict with status, properties, coverage, and diagnostics.
+    """
+    props, coverage, iterations = recursive_refinement_loop(
+        model, threshold=threshold, max_iterations=max_iterations, verbose=verbose
+    )
+    gamma = coverage["gamma_struct"]
+    if gamma < threshold:
+        return {
+            "status": "failed",
+            "reason": f"Coverage {gamma} below threshold {threshold} after {iterations} iterations.",
+            "properties": props,
+            "coverage": coverage,
+            "iterations": iterations,
+        }
+    return {
+        "status": "passed",
+        "properties": props,
+        "coverage": coverage,
+        "iterations": iterations,
     }
 
 
 def main() -> None:
     here = Path(__file__).resolve().parent
-    sample = here / "fixtures" / "sample_flow.bpmn"
-    out = run_role_a(path=sample)
+    sample = here.parent / "flow-bench" / "data" / "output" / "uid_2_output.bpmn"
+    out = run_role_a(path=sample, threshold=0.95, verbose=True)
     print(json.dumps(out["semantic_bpmn_map"], indent=2))
     print("\n--- Property suite (sample) ---")
     for p in out["property_suite_P"][:8]:
@@ -441,6 +530,12 @@ def main() -> None:
     print("...")
     print("\n--- Coverage ---")
     print(json.dumps(out["coverage_report"], indent=2))
+    print("\n--- Audit Result ---")
+    print(json.dumps({
+        "status": out["audit_result"]["status"],
+        "iterations": out["audit_result"]["iterations"],
+        "reason": out["audit_result"].get("reason", "Threshold met"),
+    }, indent=2))
     print("\n--- Mutation proxy ---")
     print(json.dumps({k: out["mutation_report"][k] for k in ("kappa_proxy", "mutants_total")}, indent=2))
 
